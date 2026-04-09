@@ -46,6 +46,8 @@
 
         public bool FullSync { get; set; }
 
+        public bool UnOpen { get; set; }
+
     }
 
     public class FollowUpdateDto

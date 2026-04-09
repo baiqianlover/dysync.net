@@ -137,7 +137,7 @@ namespace dy.net.service
             if (followed != null)
             {
                 followed.OpenSync = dto.OpenSync;
-                followed.FullSync = dto.FullSync;
+                followed.FullSync = dto.OpenSync && dto.FullSync;
                 followed.SavePath = dto.SavePath;
                 return await _followRepository.Update(followed);
             }

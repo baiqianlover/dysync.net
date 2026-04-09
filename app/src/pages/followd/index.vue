@@ -9,6 +9,7 @@
       </div>
       <div class="search-area">
 
+        未开启<a-switch v-model:checked="quaryData.unOpen" @change="onSyncFilterChange" size="small" />
         同步<a-switch v-model:checked="quaryData.openSync" @change="onSyncFilterChange" size="small" />
         全同步<a-switch v-model:checked="quaryData.fullSync" @change="onSyncFilterChange" size="small" />
         <!-- 搜索按钮 -->
@@ -197,6 +198,7 @@ interface QuaryParam {
   mySelfId?: string;
   openSync: boolean;
   fullSync: boolean;
+  unOpen: boolean;
 }
 
 interface AddForm {
@@ -270,6 +272,7 @@ const quaryData: UnwrapRef<QuaryParam> = reactive({
   mySelfId: '',
   openSync: false,
   fullSync: false,
+  unOpen: false,
 });
 
 // 生命周期 - 挂载时初始化
