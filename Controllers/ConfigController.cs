@@ -171,7 +171,7 @@ namespace dy.net.Controllers
             // 3. Cookie 有效性校验
             var cookieValid = await httpClientService.CheckCookie(dyUserCookies);
             if (!cookieValid)
-                return ApiResult.Fail("Cookie无效，请按照文档提示重新获取有效Cookie，不要使用插件获取cookie");
+                return ApiResult.Fail("Cookie无效或已过期，请按照文档提示重新获取有效Cookie，不要使用插件获取cookie");
 
             dyUserCookies.StatusCode = 0;
             dyUserCookies.StatusMsg = "正常";
@@ -235,7 +235,7 @@ namespace dy.net.Controllers
             var checkCk = await httpClientService.CheckCookie(dyUserCookies);
             if (!checkCk)
             {
-                return ApiResult.Fail("Cookie无效，请按照文档提示重新获取有效Cookie，不要使用插件获取cookie");
+                return ApiResult.Fail("Cookie无效或已过期，请按照文档提示重新获取有效Cookie，不要使用插件获取cookie");
             }
             dyUserCookies.StatusCode = 0;
             dyUserCookies.StatusMsg = "正常";
