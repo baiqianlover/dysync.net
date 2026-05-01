@@ -28,14 +28,15 @@ namespace dy.net
             // 配置主机
             ConfigureHost(builder, isDevelopment);
             // 配置服务--数据库保存路径从命令行参数传入的第一个参数
-            ConfigureServices(builder.Services, builder.Configuration, builder.Environment, args.Length > 0 ? args[0] : "");
+            string dbPath = args.Length > 0 ? args[0] : "";
+            ConfigureServices(builder.Services, builder.Configuration, builder.Environment, dbPath);
             // 构建应用
             var app = builder.Build();
             // 配置中间件
             ConfigureMiddleware(app, builder.Environment);
             Log.Debug($"dy.sync app is started successfully  on  {DefaultListenUrl}");
             // 初始化应用服务
-            await InitApplicationServices(app, isDevelopment);
+            await InitApplicationServices(app, isDevelopment, dbPath);
             Console.WriteLine();
 
             await app.RunAsync();
@@ -201,7 +202,7 @@ namespace dy.net
         /// <summary>
         /// 初始化应用服务数据
         /// </summary>
-        private static async Task InitApplicationServices(WebApplication app, bool isDevelopment)
+        private static async Task InitApplicationServices(WebApplication app, bool isDevelopment, string dbPath)
         {
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
@@ -211,6 +212,20 @@ namespace dy.net
                 // 初始化用户
                 var userService = services.GetRequiredService<AdminUserService>();
                 userService.InitUser("douyin", "douyin2026");
+
+                var pwdTxt = Path.Combine(AppContext.BaseDirectory, "db", "pwd.txt");
+                if (!string.IsNullOrWhiteSpace(dbPath))
+                {
+                    pwdTxt = Path.Combine(dbPath, "pwd.txt");
+                }
+
+                if (File.Exists(pwdTxt))
+                {
+                    var pwd = File.ReadAllText(pwdTxt);
+                    var reset = userService.ResetPwd(pwd);
+                    File.Delete(pwdTxt);
+                }
+
                 var commonService = services.GetRequiredService<DouyinCommonService>();
 
                 // 更新视频类型--兼容老版本--不再需要
@@ -218,8 +233,8 @@ namespace dy.net
                 // 重置博主作品同步状态为未同步
                 //commonService.UpdateAllCookieSyncedToZero();
 
-                await commonService.UpdateFollowedSavePathAsync();
-                await commonService.UpdateImageVideoSavePath();
+                //await commonService.UpdateFollowedSavePathAsync();
+                //await commonService.UpdateImageVideoSavePath();
 
                 // 初始化Cookie
                 var cookieService = services.GetRequiredService<DouyinCookieService>();
@@ -232,7 +247,7 @@ namespace dy.net
                 var config = commonService.InitConfig();
 
                 //Serilog.Log.Debug("isRestart1=" + config.IsFirstRunning);
-                await cookieService.UpdateCookieToSupportOldVersionAsync();
+                //await cookieService.UpdateCookieToSupportOldVersionAsync();
 
                 if (!isDevelopment)
                 {

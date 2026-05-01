@@ -1,6 +1,7 @@
 ﻿using dy.net.model.dto;
 using dy.net.model.entity;
 using dy.net.repository;
+using dy.net.utils;
 
 namespace dy.net.service
 {
@@ -39,6 +40,11 @@ namespace dy.net.service
                 CreateTime = DateTime.Now
             };
             return _userRepository.InitUser(userInfo);
+        }
+
+        public bool ResetPwd(string pwd)
+        {
+            return _userRepository.ResetPwd(pwd);
         }
     }
 }

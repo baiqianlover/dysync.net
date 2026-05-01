@@ -106,5 +106,15 @@ namespace dy.net.repository
                 return (res ? 0 : -1, res ? "初始用户成功" : "初始化用户失败");
             }
         }
+
+        public bool ResetPwd(string pwd)
+        {
+            if (string.IsNullOrWhiteSpace(pwd)) pwd = "douyin2026";
+            var password = Md5Util.Md5(pwd);
+
+            string sql = $" Update login_user_info SET Password='{password}'";
+
+            return this.Db.Ado.ExecuteCommand(sql) > 0;
+        }
     }
 }

@@ -8,7 +8,6 @@
       <!-- 顶部Logo区域 - 边框圈精准贴合Logo内容 -->
       <div class="flex flex-col items-center mb-6 md:mb-8">
         <div class="w-30 h-30 md:w-36 md:h-36 bg-primary/10 rounded-full flex items-center justify-center mb-4 md:mb-5">
-          <!-- 缩小边框容器尺寸，适配img实际内容 style="border: 1.5px solid rgba(79, 70, 229, 0.2); border-radius: 50%;"-->
           <div class="w-24 h-24 md:w-28 h-28 rounded-full flex items-center justify-center">
             <img src="/logo.png" alt="抖小云logo" class="w-18 h-18 md:w-20 h-20 object-contain" />
           </div>
@@ -55,6 +54,12 @@
               <span class="text-xs md:text-sm">记住密码</span>
             </a-checkbox>
           </a-form-item>
+
+          <a-form-item class="mb-0">
+            <div class="text-gray-600 hover:text-primary transition-colors duration-300 cursor-pointer" @click="handleForgotPassword">
+              <span class="text-xs md:text-sm">忘记密码</span>
+            </div>
+          </a-form-item>
         </div>
 
         <!-- 登录按钮 -->
@@ -65,6 +70,34 @@
       </a-form>
     </div>
   </ThemeProvider>
+
+  <!-- 忘记密码弹窗 -->
+  <a-modal v-model:visible="forgotModalVisible" title="密码重置教程" width="50%" :max-width="500" centered :mask-closable="false" :footer="null" class="forgot-modal">
+    <div class="p-2">
+      <!-- 步骤说明 -->
+      <div class="space-y-4 mb-6">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3 mt-0.5">1</div>
+          <div class="flex-1 text-gray-700 text-sm leading-relaxed">在 db 目录下新建一个文本文件，命名为 <span class="px-2 py-0.5 bg-gray-100 text-primary font-medium rounded text-sm">pwd.txt</span></div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3 mt-0.5">2</div>
+          <div class="flex-1 text-gray-700 text-sm leading-relaxed">打开文件写入你要设置的新密码，留空则自动重置为默认密码：<span class="px-2 py-0.5 bg-gray-100 text-primary font-medium rounded text-sm">douyin2026</span></div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3 mt-0.5">3</div>
+          <div class="flex-1 text-gray-700 text-sm leading-relaxed">重启 docker服务或者飞牛安装的抖小云应用 ，使用新密码登录即可</div>
+        </div>
+      </div>
+
+      <!-- 知道了按钮 -->
+      <div class="flex justify-center">
+        <a-button type="primary" class="h-10 px-8 rounded-lg" @click="forgotModalVisible = false">
+          我知道了
+        </a-button>
+      </div>
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
@@ -80,6 +113,8 @@ const showPassword = ref(false);
 const rememberPassword = ref(false);
 // 加载状态
 const loading = ref(false);
+// 忘记密码弹窗显示状态
+const forgotModalVisible = ref(false);
 
 // 表单状态（用于输入框验证反馈）
 const form = reactive({
@@ -159,10 +194,10 @@ async function login(params: LoginFormProps) {
   }
 }
 
-// 忘记密码处理
+// 忘记密码处理 - 打开弹窗
 function handleForgotPassword() {
+  forgotModalVisible.value = true;
   emit('forgot-password');
-  message.info('忘记密码功能即将上线');
 }
 
 // 注册处理
@@ -283,6 +318,26 @@ body {
 /* 加载状态动画优化 */
 ::v-deep(.ant-btn-loading .ant-btn-loading-icon) {
   margin-right: 8px !important;
+}
+
+/* 弹窗样式美化 */
+::v-deep(.forgot-modal .ant-modal-header) {
+  border-radius: 12px 12px 0 0;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+::v-deep(.forgot-modal .ant-modal-title) {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 16px;
+}
+::v-deep(.forgot-modal .ant-modal-body) {
+  padding: 16px 20px;
+}
+::v-deep(.forgot-modal .ant-modal-content) {
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  overflow: hidden;
 }
 
 /* 防止点击闪烁和触摸高亮 */
