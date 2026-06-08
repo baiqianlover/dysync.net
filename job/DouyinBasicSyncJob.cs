@@ -250,7 +250,65 @@ namespace dy.net.job
                     // 容错：如果转换失败，使用原始值（避免程序报错）
                     return $"S01E{item.MixInfo.Statis.CurrentEpisode}.mp4";
                 }
-                return $"{item.AwemeId}.mp4";
+                else
+                {
+                    string Format = "mp4";
+                    string FileHash = "";
+                    string Height = "";
+                    string Width = "";
+
+                    if (item.Video != null && item.Video.BitRate != null)
+                    {
+                        var bitrate = item.Video.BitRate.FirstOrDefault();
+                        Format = bitrate.Format;
+                        FileHash = bitrate.PlayAddr.FileHash;
+                        Height = bitrate.PlayAddr.Height.ToString();
+                        Width = bitrate.PlayAddr.Width.ToString();
+                    }
+                    else
+                    {
+                        //图片合成视频，参数要自己写。
+                        var image = item.Images?.FirstOrDefault();
+                        if (image != null)
+                        {
+                            FileHash = IdGener.GetGuid().ToLower().Replace("-", "");//使用随机值，避免重复
+                            Height = image.Height.ToString();
+                            Width = image.Width.ToString();
+                        }
+                    }
+
+
+                    string fileName;
+                    //if (config?.UperUseViedoTitle ?? false)//优先
+                    //{
+                    //    var sampleName = DouyinFileNameHelper.SanitizeLinuxFileName(item.Desc, item.AwemeId);
+                    //    var (existingName, _) = douyinVideoService.GetUperLastViedoFileName(item.Author.Uid, sampleName);
+                    //    fileName = string.IsNullOrWhiteSpace(existingName) ? $"{sampleName}.{Format}" : $"{existingName}.{Format}";
+                    //}
+                    //else
+                    //{
+
+                    if (!string.IsNullOrWhiteSpace(config.FullFollowedTitleTemplate))
+                    {
+                        var fullName = VideoTitleGenerator.Generate(config.FullFollowedTitleTemplate, new VideoTitleDataTemplate
+                        {
+                            FileHash = FileHash,
+                            Id = item.AwemeId,
+                            ReleaseTime = DateTimeUtil.Convert10BitTimestamp(item.CreateTime),
+                            Resolution = $"{Width}×{Height}",
+                            VideoTitle = DouyinFileNameHelper.SanitizeLinuxFileName(item.Desc, item.AwemeId),
+                            Author = item.Author.Nickname
+                        });
+
+                        fileName = $"{fullName}.{Format}";
+                    }
+                    else
+                    {
+                        fileName = $"{item.AwemeId}.{Format}";
+                    }
+                    //}
+                    return fileName;
+                }
             }
         }
         /// <summary>
