@@ -104,8 +104,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="dy.sync.lib">
-      <HintPath>lib\dy.sync.lib.dll</HintPath>
+    <Reference Include="jzc.http.lib">
+      <HintPath>lib\jzc.http.lib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
